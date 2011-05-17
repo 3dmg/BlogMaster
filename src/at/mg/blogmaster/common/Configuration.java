@@ -6,4 +6,5 @@ public class Configuration {
 	public static boolean DEV_MODE = true;
 	
 	public static String feedUrl = "http://feeds.feedburner.com/mobiFlip";
+//	public static String feedUrl = "http://www.thoughtsfromhell.net/feed/";
 }

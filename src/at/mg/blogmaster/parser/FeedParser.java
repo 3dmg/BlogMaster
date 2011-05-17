@@ -7,15 +7,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.sax.Element;
-import android.sax.EndElementListener;
-import android.sax.EndTextElementListener;
-import android.sax.RootElement;
+import org.xmlpull.v1.XmlPullParser;
+
 import android.util.Xml;
+import at.mg.blogmaster.common.Log;
 
 public class FeedParser {
 
-	private static final String RSS = "rss";
 	private static final String CHANNEL = "channel";
 	private static final String ITEM = "item";
 
@@ -36,54 +34,57 @@ public class FeedParser {
 			throw new RuntimeException(e);
 		}
 	}
-
+	
 	public List<Entry> parse() {
-		final Entry currentEntry = new Entry();
-		RootElement root = new RootElement(RSS);
-		final List<Entry> messages = new ArrayList<Entry>();
-		Element channel = root.getChild(CHANNEL);
-		Element item = channel.getChild(ITEM);
-		item.setEndElementListener(new EndElementListener() {
-			public void end() {
-				messages.add(currentEntry.copy());
-			}
-		});
-		item.getChild(Entry.TAG_TITLE).setEndTextElementListener(
-				new EndTextElementListener() {
-					public void end(String body) {
-						currentEntry.title = body;
-					}
-				});
-		item.getChild(Entry.TAG_LINK).setEndTextElementListener(
-				new EndTextElementListener() {
-					public void end(String body) {
-						currentEntry.link = body;
-					}
-				});
-		item.getChild(Entry.TAG_DESCRIPTION).setEndTextElementListener(
-				new EndTextElementListener() {
-					public void end(String body) {
-						currentEntry.desc = body;
-					}
-				});
-		item.getChild(Entry.TAG_DATE).setEndTextElementListener(
-				new EndTextElementListener() {
-					public void end(String body) {
-						currentEntry.setDate(body);
-					}
-				});
-		item.getChild(Entry.TAG_CONTENT).setEndTextElementListener(
-				new EndTextElementListener() {
-					public void end(String body) {
-						currentEntry.content = body;
-					}
-				});
+		List<Entry> messages = null;
+		XmlPullParser parser = Xml.newPullParser();
 		try {
-			Xml.parse(this.getInputStream(), Xml.Encoding.UTF_8,
-					root.getContentHandler());
+			// auto-detect the encoding from the stream
+			parser.setInput(this.getInputStream(), null);
+			int eventType = parser.getEventType();
+			Entry currentMessage = null;
+			boolean done = false;
+			while (eventType != XmlPullParser.END_DOCUMENT && !done){
+				String name = null;
+				switch (eventType){
+					case XmlPullParser.START_DOCUMENT:
+						messages = new ArrayList<Entry>();
+						break;
+					case XmlPullParser.START_TAG:
+						name = parser.getName();
+//						Log.d("parseName: " + name);
+						if (name.equalsIgnoreCase(ITEM)){
+							currentMessage = new Entry();
+						} else if (currentMessage != null){
+							if (name.equalsIgnoreCase(Entry.TAG_LINK)){
+								currentMessage.link = (parser.nextText());
+							} else if (name.equalsIgnoreCase(Entry.TAG_DESCRIPTION)){
+								currentMessage.desc = (parser.nextText());
+							} else if (name.equalsIgnoreCase(Entry.TAG_DATE)){
+								currentMessage.setDate(parser.nextText());
+							} else if (name.equalsIgnoreCase(Entry.TAG_TITLE)){
+								currentMessage.title = parser.nextText();
+							} else if (name.equals(Entry.TAG_CONTENT)){
+								currentMessage.content = parser.nextText();
+							}
+						}
+						break;
+					case XmlPullParser.END_TAG:
+						name = parser.getName();
+						if (name.equalsIgnoreCase(ITEM) && currentMessage != null){
+							messages.add(currentMessage);
+						} else if (name.equalsIgnoreCase(CHANNEL)){
+							done = true;
+						}
+						break;
+				}
+				eventType = parser.next();
+			}
 		} catch (Exception e) {
+			Log.e("AndroidNews::PullFeedParser", e);
 			throw new RuntimeException(e);
 		}
 		return messages;
-	}
+	}	
+	
 }

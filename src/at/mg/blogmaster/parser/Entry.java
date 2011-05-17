@@ -10,7 +10,7 @@ public class Entry {
 	public static String TAG_LINK = "link";
 	public static String TAG_DESCRIPTION = "description";
 	public static String TAG_DATE = "pubDate";
-	public static String TAG_CONTENT = "content";
+	public static String TAG_CONTENT = "encoded";
 	
 	private static SimpleDateFormat FORMATTER = 
 		new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z");
@@ -41,7 +41,7 @@ public class Entry {
 		try {
 			this.date = FORMATTER.parse(date.trim());
 		} catch (ParseException e) {
-			throw new RuntimeException(e);
+//			throw new RuntimeException(e);
 		}
 	}	
 	
