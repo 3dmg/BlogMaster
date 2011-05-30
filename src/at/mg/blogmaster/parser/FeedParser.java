@@ -35,36 +35,36 @@ public class FeedParser {
 		}
 	}
 	
-	public List<Entry> parse() {
-		List<Entry> messages = null;
+	public List<BlogPost> parse() {
+		List<BlogPost> messages = null;
 		XmlPullParser parser = Xml.newPullParser();
 		try {
 			// auto-detect the encoding from the stream
 			parser.setInput(this.getInputStream(), null);
 			int eventType = parser.getEventType();
-			Entry currentMessage = null;
+			BlogPost currentMessage = null;
 			boolean done = false;
 			while (eventType != XmlPullParser.END_DOCUMENT && !done){
 				String name = null;
 				switch (eventType){
 					case XmlPullParser.START_DOCUMENT:
-						messages = new ArrayList<Entry>();
+						messages = new ArrayList<BlogPost>();
 						break;
 					case XmlPullParser.START_TAG:
 						name = parser.getName();
 //						Log.d("parseName: " + name);
 						if (name.equalsIgnoreCase(ITEM)){
-							currentMessage = new Entry();
+							currentMessage = new BlogPost();
 						} else if (currentMessage != null){
-							if (name.equalsIgnoreCase(Entry.TAG_LINK)){
+							if (name.equalsIgnoreCase(BlogPost.TAG_LINK)){
 								currentMessage.link = (parser.nextText());
-							} else if (name.equalsIgnoreCase(Entry.TAG_DESCRIPTION)){
+							} else if (name.equalsIgnoreCase(BlogPost.TAG_DESCRIPTION)){
 								currentMessage.desc = (parser.nextText());
-							} else if (name.equalsIgnoreCase(Entry.TAG_DATE)){
+							} else if (name.equalsIgnoreCase(BlogPost.TAG_DATE)){
 								currentMessage.setDate(parser.nextText());
-							} else if (name.equalsIgnoreCase(Entry.TAG_TITLE)){
+							} else if (name.equalsIgnoreCase(BlogPost.TAG_TITLE)){
 								currentMessage.title = parser.nextText();
-							} else if (name.equals(Entry.TAG_CONTENT)){
+							} else if (name.equals(BlogPost.TAG_CONTENT)){
 								currentMessage.content = parser.nextText();
 							}
 						}

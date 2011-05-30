@@ -4,7 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Entry {
+public class BlogPost {
 
 	public static String TAG_TITLE = "title";
 	public static String TAG_LINK = "link";
@@ -21,8 +21,8 @@ public class Entry {
 	public String content;
 	private Date date;
 	
-	public Entry copy(){
-		Entry entry = new Entry();
+	public BlogPost copy(){
+		BlogPost entry = new BlogPost();
 		entry.title = title;
 		entry.link = link;
 		entry.desc = desc;

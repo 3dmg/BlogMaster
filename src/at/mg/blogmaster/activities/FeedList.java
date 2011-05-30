@@ -14,12 +14,12 @@ import android.widget.TextView;
 import at.mg.blogmaster.R;
 import at.mg.blogmaster.common.Configuration;
 import at.mg.blogmaster.common.Log;
-import at.mg.blogmaster.parser.Entry;
+import at.mg.blogmaster.parser.BlogPost;
 import at.mg.blogmaster.parser.FeedParser;
 
 public class FeedList extends Activity {
 
-	private List<Entry> entries;
+	private List<BlogPost> entries;
 	private EntryAdapter ad;
 	
 	@Override
@@ -37,12 +37,7 @@ public class FeedList extends Activity {
 		
 		new Thread(){
 			public void run() {
-				FeedParser parser = new FeedParser(Configuration.feedUrl);
-				entries = parser.parse();
-				Log.i("entries " + entries.size());
-				for(Entry e : entries){
-					Log.i(e.title + " \n " + e.content);
-				}
+
 				
 				updater.sendEmptyMessage(0);
 				
@@ -79,7 +74,7 @@ public class FeedList extends Activity {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			
-			Entry en = entries.get(position);
+			BlogPost en = entries.get(position);
 			
 			LinearLayout ll = new LinearLayout(FeedList.this);
 			
