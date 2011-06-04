@@ -37,7 +37,7 @@ public class FeedList extends Activity {
 		
 		new Thread(){
 			public void run() {
-
+				
 				
 				updater.sendEmptyMessage(0);
 				
