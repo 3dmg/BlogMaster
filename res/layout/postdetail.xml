@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:orientation="vertical">
+
+	<TextView android:layout_width="wrap_content" android:layout_margin="5dp"
+		android:layout_height="wrap_content" android:id="@+id/detail_title"
+		android:layout_alignParentLeft="true" android:layout_alignParentTop="true"></TextView>
+
+
+	<TextView android:layout_width="wrap_content"
+		android:layout_below="@id/detail_title" android:layout_height="wrap_content"
+		android:id="@+id/detail_date_label" android:text="Datum:" android:layout_margin="5dp"></TextView>
+	<TextView android:layout_width="wrap_content" android:layout_margin="5dp"
+		android:layout_toRightOf="@id/detail_date_label" android:layout_below="@id/detail_title"
+		android:layout_height="wrap_content" android:id="@+id/detail_date"></TextView>
+
+	<WebView android:id="@+id/detail_content" android:layout_width="fill_parent"
+		android:layout_height="fill_parent" android:layout_below="@id/detail_date_label" />
+
+</RelativeLayout>
