@@ -4,14 +4,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import at.mg.blogmaster.BlogApp;
@@ -30,7 +30,7 @@ public class FeedList extends PostActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		ad = new EntryAdapter();
+		ad = new EntryAdapter(getLayoutInflater());
 
 		setContentView(R.layout.feedlist);
 
@@ -38,18 +38,19 @@ public class FeedList extends PostActivity {
 		liste.setAdapter(ad);
 		liste.setOnItemClickListener(new OnItemClickListener() {
 
-			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				Intent intent = new Intent(FeedList.this, PostDetail.class);
-				intent.putExtra(Constants.EXTRA_POSTID, entries[position].localID);
+				intent.putExtra(Constants.EXTRA_POSTID,
+						entries[position].localID);
 				startActivity(intent);
 			}
-			
+
 		});
 
-		startService(new Intent(this, BlogService.class));
-
+		Intent i = new Intent(FeedList.this, BlogService.class);
+		i.putExtra("start", "list");
+		startService(i);
 	}
 
 	@Override
@@ -61,39 +62,48 @@ public class FeedList extends PostActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		registerReceiver(receiver, new IntentFilter(Constants.BC_UPDATELIST));
-	}
+		IntentFilter inF = new IntentFilter(Constants.BC_UPDATELIST);
+		inF.setPriority(10);
+		registerReceiver(receiver, inF);
 
-	private Handler updater = new Handler() {
-		public void handleMessage(android.os.Message msg) {
-			ad.notifyDataSetChanged();
-		};
-	};
+		new GuiUpdater().execute((Void[]) null);
+	}
 
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			new Thread() {
-				public void run() {
-					entries = BlogApp.getDA().getBlogPosts();
-					runOnUiThread(new Runnable() {
-
-						@Override
-						public void run() {
-							ad.notifyDataSetChanged();
-						}
-					});
-
-				};
-			}.start();
-
+			new GuiUpdater().execute((Void[]) null);
+			this.abortBroadcast();
 		}
 	};
 
-	private class EntryAdapter extends BaseAdapter {
+	private class GuiUpdater extends AsyncTask<Void, Void, Void> {
 
 		@Override
+		protected Void doInBackground(Void... params) {
+			BlogApp.getDA().markAllAsRead();
+			entries = BlogApp.getDA().getBlogPosts();
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			ad.notifyDataSetChanged();
+
+		}
+
+	}
+
+	private class EntryAdapter extends BaseAdapter {
+
+		LayoutInflater li;
+
+		public EntryAdapter(LayoutInflater li) {
+			this.li = li;
+		}
+
 		public int getCount() {
 			if (entries != null) {
 				return entries.length;
@@ -101,33 +111,72 @@ public class FeedList extends PostActivity {
 			return 0;
 		}
 
-		@Override
 		public Object getItem(int arg0) {
 			return arg0;
 		}
 
-		@Override
 		public long getItemId(int position) {
 			return position;
 		}
 
-		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 
 			BlogPost en = entries[position];
 
-			LinearLayout ll = new LinearLayout(FeedList.this);
+			ViewHolder holder;
 
-			ll.setOrientation(LinearLayout.VERTICAL);
-			TextView title = new TextView(FeedList.this);
-			title.setText(en.title);
-			ll.addView(title);
+			if (convertView != null) {
+				holder = (ViewHolder) convertView.getTag();
+			} else {
+				convertView = li.inflate(R.layout.post_row, null);
+				holder = new ViewHolder(convertView);
+				convertView.setTag(holder);
+			}
 
-			TextView desc = new TextView(FeedList.this);
-			desc.setText(en.desc);
-			ll.addView(desc);
+			// holder.getDate().setText(en.getDate());
+			holder.getDesc().setText(en.desc);
+			holder.getTitle().setText(en.title);
 
-			return ll;
+			return convertView;
+		}
+
+		/**
+		 * helper class for holding the row elements
+		 * 
+		 * @author Markus
+		 * 
+		 */
+		class ViewHolder {
+			private TextView date;
+			private TextView title;
+			private TextView desc;
+			private View base;
+
+			public ViewHolder(View base) {
+				this.base = base;
+			}
+
+			public TextView getDate() {
+				if (date == null) {
+					// date = (TextView) base.findViewById(R.id.postrow_date);
+				}
+				return date;
+			}
+
+			public TextView getTitle() {
+				if (title == null) {
+					title = (TextView) base.findViewById(R.id.postrow_title);
+				}
+				return title;
+			}
+
+			public TextView getDesc() {
+				if (desc == null) {
+					desc = (TextView) base.findViewById(R.id.postrow_desc);
+				}
+				return desc;
+			}
+
 		}
 
 	}

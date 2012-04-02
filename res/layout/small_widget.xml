@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent" android:background="@color/blue" android:layout_margin="1dp">
+
+	<ImageView android:id="@+id/widget_pic" android:src="@drawable/icon"
+		android:layout_alignParentLeft="true" android:layout_alignParentTop="true"
+		android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="2dp" />
+
+	<TextView android:id="@+id/widget_date"
+	    android:layout_alignParentTop="true" 
+		 android:layout_toRightOf="@id/widget_pic"
+		android:text="@string/news_desc" android:layout_width="fill_parent" android:textColor="@color/title_text"
+		android:layout_height="wrap_content" android:maxLines="2" android:ellipsize="marquee"/>	
+	
+	<TextView android:id="@+id/widget_title"
+		android:layout_toRightOf="@id/widget_pic" android:layout_below="@id/widget_date"
+		android:text="@string/news_title" android:layout_width="fill_parent" android:textColor="@color/title_text"
+		android:layout_height="wrap_content" android:maxLines="2" android:ellipsize="marquee"/>
+	
+
+
+</RelativeLayout>

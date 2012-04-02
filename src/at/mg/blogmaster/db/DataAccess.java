@@ -1,5 +1,6 @@
 package at.mg.blogmaster.db;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -11,7 +12,7 @@ import at.mg.blogmaster.parser.BlogPost;
 public class DataAccess {
 
 	private static final String DBNAME = "posts.db";
-	private final static int DBVERSION = 1;
+	private static final int DBVERSION = 6;
 
 	private DBHelper dbHelper;
 	private SQLiteDatabase db;
@@ -138,10 +139,8 @@ public class DataAccess {
 
 			post = new BlogPost();
 
-			int i = 0;
 			do {
 				post = getBlogPostFromCursor(postCursor);
-				i++;
 			} while (postCursor.moveToNext());
 			postCursor.close();
 		} catch (Exception e) {
@@ -149,6 +148,58 @@ public class DataAccess {
 			return null;
 		}
 		return post;
+	}
+
+	/**
+	 * return all unread posts
+	 * 
+	 * @return
+	 */
+	public final BlogPost[] getUnreadPosts() {
+
+		BlogPost[] posts;
+
+		String[] values = null;
+		String where = null;
+
+		values = new String[] { "1" };
+		where = DBHelper.KEY_UNREAD + " = ?";
+
+		try {
+			if (usePragma)
+				db.execSQL("PRAGMA synchronous=OFF");
+			Cursor postCursor = db.query(DBHelper.TABLE_BLOGPOST,
+					new String[] {}, where, values, null, null, "date DESC");
+
+			if (!postCursor.moveToFirst()) {
+				postCursor.close();
+				// cursor is empty
+				return null;
+			}
+
+			posts = new BlogPost[postCursor.getCount()];
+			int i = 0;
+			do {
+				posts[i] = getBlogPostFromCursor(postCursor);
+				i++;
+			} while (postCursor.moveToNext());
+			postCursor.close();
+		} catch (Exception e) {
+			Log.e("getPost " + e.toString(), e);
+			return null;
+		}
+		return posts;
+	}
+
+	/**
+	 * mark all unread posts as read
+	 */
+	public final void markAllAsRead() {
+		ContentValues update = new ContentValues();
+		update.put(DBHelper.KEY_UNREAD, 0);
+
+		db.update(DBHelper.TABLE_BLOGPOST, update,
+				DBHelper.KEY_UNREAD + " = ?", new String[] { "1" });
 	}
 
 	/**
@@ -160,12 +211,13 @@ public class DataAccess {
 	private final BlogPost getBlogPostFromCursor(Cursor postCursor) {
 		BlogPost post = new BlogPost();
 
-		post.localID = postCursor.getInt(DBHelper.ID_COLUMN);
-		post.title = postCursor.getString(DBHelper.TITLE_COLUMN);
-		post.desc = postCursor.getString(DBHelper.DESC_COLUMN);
-		post.link = postCursor.getString(DBHelper.LINK_COLUMN);
-		post.content = postCursor.getString(DBHelper.CONTENT_COLUMN);
-		post.setDate(postCursor.getLong(DBHelper.DATE_COLUMN));
+		post.localID = postCursor.getInt(DBHelper.COLUMN_ID);
+		post.title = postCursor.getString(DBHelper.COLUMN_TITLE);
+		post.desc = postCursor.getString(DBHelper.COLUMN_DESC);
+		post.link = postCursor.getString(DBHelper.COLUMN_LINK);
+		post.content = postCursor.getString(DBHelper.COLUMN_CONTENT);
+		post.setDate(postCursor.getLong(DBHelper.COLUMN_DATE));
+		post.unread = postCursor.getLong(DBHelper.COLUMN_UNREAD) == 1;
 
 		return post;
 	}
@@ -186,10 +238,10 @@ public class DataAccess {
 		try {
 			if (usePragma)
 				db.execSQL("PRAGMA synchronous=OFF");
-			postInsert = db
-					.compileStatement("INSERT INTO " + DBHelper.TABLE_BLOGPOST
-							+ " (title,desc,link,content,date) "
-							+ "VALUES (?,?,?,?,?)");
+			postInsert = db.compileStatement("INSERT INTO "
+					+ DBHelper.TABLE_BLOGPOST
+					+ " (title,desc,link,content,date,unread) "
+					+ "VALUES (?,?,?,?,?,?)");
 
 			int c = 0;
 			postInsert.bindString(++c, post.title);
@@ -197,6 +249,7 @@ public class DataAccess {
 			postInsert.bindString(++c, post.link);
 			postInsert.bindString(++c, post.content);
 			postInsert.bindLong(++c, post.getDateTime());
+			postInsert.bindLong(++c, post.unread ? 1 : 0);
 
 			post.localID = (int) postInsert.executeInsert();
 
@@ -212,9 +265,16 @@ public class DataAccess {
 	/**
 	 * delete all blogposts to clean up the db
 	 */
-	public void deleteAllBlogPosts() {
+	public void deleteAllBlogPosts(String where) {
 		try {
+			Log.i("delete All BlogPosts where " + where);
+
+			// if(where == null){
 			db.delete(DBHelper.TABLE_BLOGPOST, null, null);
+			// } else {
+			// db.rawQuery("DELETE FROM + " + DBHelper.TABLE_BLOGPOST +
+			// " WHERE " + where, null);
+			// }
 		} catch (Exception e) {
 			Log.e("deleteAllBP", e);
 		}

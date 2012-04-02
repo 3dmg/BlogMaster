@@ -1,21 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical" android:layout_width="fill_parent"
-	android:layout_height="fill_parent" android:gravity="center_vertical">
-	
-	<TextView android:id="@+id/title" android:layout_width="wrap_content"
-		android:layout_height="wrap_content" android:text="TextView"
-		android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
-		android:layout_marginLeft="5dp"></TextView>
-	<TextView android:id="@+id/date" android:layout_width="wrap_content"
-		android:layout_height="wrap_content" android:text="TextView"
-		android:layout_alignTop="@+id/title" android:layout_alignParentRight="true"
-		android:layout_marginRight="10dp"></TextView>
-	<TextView android:id="@+id/desc" android:layout_width="wrap_content"
-		android:layout_height="wrap_content" android:text="TextView"
-		android:layout_below="@+id/title" android:layout_marginTop="10dp"
-		android:layout_centerHorizontal="true"></TextView>
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/background" >
 
+    <ImageView
+        android:layout_width="17dp"
+        android:layout_height="fill_parent"
+        android:contentDescription="TODO"
+        android:padding="3dp"
+        android:src="@drawable/line" />
 
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+
+        <!--
+                 <TextView android:id="@+id/postrow_date" android:layout_width="wrap_content" 
+				android:layout_height="wrap_content" android:layout_alignParentTop="true" 
+				android:layout_alignParentRight="true" android:layout_marginRight="10dp"></TextView>
+        -->
+
+        <TextView
+            android:id="@+id/postrow_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="5dp"
+            android:paddingTop="5dp"
+            android:textColor="@color/title_text"
+            android:textStyle="bold" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/postrow_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/postrow_title"
+            android:layout_marginLeft="5dp"
+            android:ellipsize="marquee"
+            android:maxLines="2"
+            android:paddingBottom="5dp"
+            android:textColor="@color/desc_text"
+            android:textStyle="italic" >
+        </TextView>
+    </RelativeLayout>
 
 </RelativeLayout>

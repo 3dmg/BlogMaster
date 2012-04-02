@@ -26,6 +26,7 @@ public class PostDetail extends PostActivity {
 
 			@Override
 			protected Void doInBackground(Void... params) {
+				BlogApp.getDA().markAllAsRead();
 				post = BlogApp.getDA().getBlogPostsByLocalID(localID);
 				return null;
 			}
@@ -34,9 +35,10 @@ public class PostDetail extends PostActivity {
 			protected void onPostExecute(Void result) {
 				super.onPostExecute(result);
 				updateGUI();
+
 			}
 
-		}.execute((Void[])null);
+		}.execute((Void[]) null);
 
 	}
 
@@ -52,9 +54,9 @@ public class PostDetail extends PostActivity {
 
 		TextView date = (TextView) findViewById(R.id.detail_date);
 		date.setText(post.getDate());
-		
+
 		WebView content = (WebView) findViewById(R.id.detail_content);
 		content.loadDataWithBaseURL("fake://fake.fk", post.content,
-				"text/html", "UTF-8", null);	
+				"text/html", "UTF-8", null);
 	}
 }

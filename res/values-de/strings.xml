@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">mobiFlip.de</string>
+    <string name="menu_info">Info</string>
+    <string name="menu_share">Teilen</string>
+    <string name="menu_settings">Einstellungen</string>
+    <string name="menu_exit">Beenden</string>
+    <string name="setting_not_title">Benachrichtigungseinstellungen</string>
+    <string name="setting_not_enable">Benachrichtigungen aktivieren</string>
+    <string name="setting_not_enable_desc">Regelmäßig überprüfen ob es neue Posts gibt</string>
+    <string name="setting_not_vibrate">Vibration</string>
+    <string name="setting_not_sound">Ton abspielen</string>
+    <string name="setting_not_interval">Häufigkeit</string>
+
+    <string-array name="setting_not_intervals">
+        <item>Viertelstündlich</item>
+        <item>Halbstündlich</item>
+        <item>Stündlich</item>
+        <item>Halbtäglich</item>
+        <item>Täglich</item>
+    </string-array>
+    <string-array name="setting_not_intervals_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>720</item>
+        <item>1440</item>
+    </string-array>
+
+    <string name="info">We love Smartphones!\nmobiFlip.de - Sammelalbum &amp; Testberichte aus der mobilen Welt.\nHier findest du täglich handverlesene Infos u Apps, Hardware &amp; Zubehör\n\ntwitter.com/mobiFlip \n\n facebook.com/mobiFlip</string>
+    <string name="news_desc">News Desc</string>
+    <string name="news_title">News Title</string>
+
+</resources>

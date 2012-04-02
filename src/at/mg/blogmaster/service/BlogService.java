@@ -2,47 +2,20 @@ package at.mg.blogmaster.service;
 
 import java.util.List;
 
-import android.app.Service;
+import android.app.IntentService;
 import android.content.Intent;
-import android.os.IBinder;
 import at.mg.blogmaster.BlogApp;
 import at.mg.blogmaster.common.Configuration;
 import at.mg.blogmaster.common.Constants;
 import at.mg.blogmaster.common.Log;
+import at.mg.blogmaster.db.DBHelper;
 import at.mg.blogmaster.parser.BlogPost;
 import at.mg.blogmaster.parser.FeedParser;
 
-public class BlogService extends Service {
+public class BlogService extends IntentService {
 
-	@Override
-	public IBinder onBind(Intent intent) {
-
-		return null;
-	}
-
-	@Override
-	public void onStart(Intent intent, int startId) {
-		super.onStart(intent, startId);
-
-		handleCommand(intent, startId);
-	}
-
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-
-		handleCommand(intent, startId);
-
-		return Service.START_NOT_STICKY;
-	}
-
-	private void handleCommand(Intent intent, int startId) {
-		new Thread() {
-			public void run() {
-				readRSS();
-
-				BlogService.this.stopSelf();
-			};
-		}.start();
+	public BlogService() {
+		super("BlogService");
 
 	}
 
@@ -50,44 +23,92 @@ public class BlogService extends Service {
 	 * read from the rss stream, and save new blogposts
 	 */
 	private synchronized void readRSS() {
-		Log.i("readRSS");
-		FeedParser parser = new FeedParser(Configuration.feedUrl);
-		List<BlogPost> entries = parser.parse();
-		Log.i("entries " + entries.size());
+		try {
+			Log.i("readRSS");
+			FeedParser parser = new FeedParser(Configuration.feedUrl);
+			List<BlogPost> entries = parser.parse();
 
-		// TODO only the newest necessary
-		BlogPost[] oldEntries = BlogApp.getDA().getBlogPosts();
+			if (entries == null) {
+				return;
+			}
 
-		if (oldEntries != null) {
+			Log.i("entries " + entries.size());
 
-			if (entries.get(entries.size() - 1).getDateTime() > oldEntries[0]
-					.getDateTime()) {
-				// the oldest post of the new entries is NEWER than the newest
-				// saved post
-				// delete all saved posts
-//				Log.i("deleteAll "
-//						+ entries.get(entries.size() - 1).getDateTime() + " "
-//						+ oldEntries[0].getDateTime());
-				BlogApp.getDA().deleteAllBlogPosts();
-				
-			} else {
-				BlogPost post;
-				for (int i = entries.size() - 1; i >= 0; i--) {
-					post = entries.get(i);
-					if (post.getDateTime() <= oldEntries[0].getDateTime()) {
-						//remove new post if post is younger than the newest saved post
-//						Log.i("remove new post " + post.getDateTime() + " "
-//								+ oldEntries[0].getDateTime());
-						entries.remove(post);
+			BlogPost[] oldEntries = BlogApp.getDA().getBlogPosts();
+
+			if (oldEntries != null && entries.size() > 0) {
+
+				if (entries.get(entries.size() - 1).getDateTime() > oldEntries[0]
+						.getDateTime()) {
+					// the oldest post of the new entries is NEWER than the
+					// newest
+					// saved post
+					// delete all saved posts
+					// Log.i("deleteAll "
+					// + entries.get(entries.size() - 1).getDateTime() + " "
+					// + oldEntries[0].getDateTime());
+					BlogApp.getDA().deleteAllBlogPosts(null);
+					oldEntries = null;
+				} else {
+					BlogPost post;
+					for (int i = entries.size() - 1; i >= 0; i--) {
+						post = entries.get(i);
+						if (post.getDateTime() <= oldEntries[0].getDateTime()) {
+							// remove new post if post is younger than the
+							// newest
+							// saved post
+							// Log.i("remove new post " + post.getDateTime() +
+							// " "
+							// + oldEntries[0].getDateTime());
+							entries.remove(post);
+						}
 					}
 				}
+
+				if (oldEntries != null) {
+					int diff = (oldEntries.length + entries.size())
+							- Configuration.MAX_POSTS;
+					if (diff > 0) {
+						Log.i("max post count reached " + diff);
+						String whereClause = "";
+						for (int i = oldEntries.length - 1, j = 1; i >= oldEntries.length
+								- diff; i--, j++) {
+							whereClause += DBHelper.KEY_ID + "="
+									+ oldEntries[i].localID
+									+ (j < diff ? " OR " : "");
+						}
+						BlogApp.getDA().deleteAllBlogPosts(whereClause);
+					}
+				}
+
 			}
+
+			Log.i("new entries " + entries.size());
+			for (BlogPost post : entries) {
+				post.unread = true;
+				BlogApp.getDA().saveBlogpost(post);
+			}
+
+			sendOrderedBroadcast(new Intent(Constants.BC_UPDATELIST), null);
+
+		} catch (Exception e) {
+			Log.e("parseRSS", e);
 		}
 
-		for (BlogPost post : entries) {
-			BlogApp.getDA().saveBlogpost(post);
+	}
+
+	@Override
+	protected void onHandleIntent(Intent intent) {
+
+		String start = intent.getStringExtra("start");
+		if (start != null) {
+			Log.i("BlogService:onHandle " + start);
 		}
-		sendBroadcast(new Intent(Constants.BC_UPDATELIST));
+
+		readRSS();
+		if (start != null && start.equals("mv")) {
+			BlogApp.getDA().markAllAsRead();
+		}
 	}
 
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceCategory android:title="@string/setting_not_title">
+	<CheckBoxPreference android:key="BM_PREF_NOT" android:title="@string/setting_not_enable" android:summary="@string/setting_not_enable_desc" android:defaultValue="true" />
+	<CheckBoxPreference android:key="BM_PREF_NOT_VIBRATE" android:title="@string/setting_not_vibrate" android:defaultValue="true" />
+	<CheckBoxPreference android:key="BM_PREF_NOT_SOUND" android:title="@string/setting_not_sound"  android:defaultValue="true" />
+	
+	<ListPreference android:key="BM_PREF_NOT_INTERVAL" android:title="@string/setting_not_interval" android:entries="@array/setting_not_intervals" android:entryValues="@array/setting_not_intervals_values" />
+
+
+	</PreferenceCategory>
+
+</PreferenceScreen>
