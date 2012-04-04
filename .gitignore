@@ -1,13 +1,13 @@
 /gen
-<<<<<<< HEAD
 
 /bin
+
 .classpath
-.project
-/.settings
-lint.xml
-.checkstyle
-=======
 
-/bin
->>>>>>> 772787fb2d117805e128f3309073c6c5bcba3b65
+.project
+
+/.settings
+
+lint.xml
+
+.checkstyle
