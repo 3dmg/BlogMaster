@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package at.mg.blogmaster;
 
 import org.acra.ACRA;
@@ -95,3 +96,29 @@ public class BlogApp extends Application {
 	}
 
 }
+=======
+package at.mg.blogmaster;
+
+import android.app.Application;
+import android.content.Context;
+import at.mg.blogmaster.db.DataAccess;
+
+public class BlogApp extends Application {
+
+	private static DataAccess da;
+	private static Context context;
+	
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		context = getApplicationContext();
+	}
+	
+	public static DataAccess getDA(){
+		if(da != null){
+			da = new DataAccess(context);
+		}
+		return da;
+	}
+}
+>>>>>>> 772787fb2d117805e128f3309073c6c5bcba3b65
