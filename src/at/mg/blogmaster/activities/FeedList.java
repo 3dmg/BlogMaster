@@ -156,12 +156,12 @@ public class FeedList extends PostActivity {
 				this.base = base;
 			}
 
-			public TextView getDate() {
-				if (date == null) {
-					// date = (TextView) base.findViewById(R.id.postrow_date);
-				}
-				return date;
-			}
+//			public TextView getDate() {
+//				if (date == null) {
+//					// date = (TextView) base.findViewById(R.id.postrow_date);
+//				}
+//				return date;
+//			}
 
 			public TextView getTitle() {
 				if (title == null) {
