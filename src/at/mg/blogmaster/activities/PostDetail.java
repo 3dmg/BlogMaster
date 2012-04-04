@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 package at.mg.blogmaster.activities;
 
 import android.os.AsyncTask;
@@ -61,12 +60,3 @@ public class PostDetail extends PostActivity {
 				"text/html", "UTF-8", null);
 	}
 }
-=======
-package at.mg.blogmaster.activities;
-
-import android.app.Activity;
-
-public class PostDetail extends Activity {
-
-}
->>>>>>> 772787fb2d117805e128f3309073c6c5bcba3b65

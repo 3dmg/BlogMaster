@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<<<<<<< HEAD
 	<string name="app_name">mobiFlip.de</string>
 
 	<string name="menu_info">Info</string>
@@ -39,8 +38,4 @@
 	<string name="news_desc">News Desc</string>	
 
 	<string name="news_title">News Title</string>
-
-=======
-    <string name="app_name">BlogMaster</string>
->>>>>>> 772787fb2d117805e128f3309073c6c5bcba3b65
 </resources>
