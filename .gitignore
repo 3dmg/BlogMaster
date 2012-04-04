@@ -3,3 +3,6 @@
 /bin
 .classpath
 .project
+/.settings
+lint.xml
+.checkstyle
