@@ -1,3 +1,3 @@
 # BlogMaster
 
-testing application for an RSS reader
+testing application for a RSS reader
